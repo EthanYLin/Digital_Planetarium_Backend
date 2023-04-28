@@ -70,10 +70,10 @@ public class Figure {
     public Figure(boolean useRandom) {
         if (useRandom) {
             //TODO: get from database
-            this.headCNo = util.randomInt(0, 1);
-            this.headGNo = util.randomInt(0, 11);
-            this.bodyCNo = util.randomInt(0, 3);
-            this.bodyGNo = util.randomInt(0, 11);
+            this.headGNo = util.randomInt(0, 1);
+            this.bodyGNo = util.randomInt(0, 3);
+            this.headCNo = util.randomInt(0, 11);
+            this.bodyCNo = util.randomInt(0, 11);
         } else {
             //TODO: get default value from database
             this.headCNo = this.headGNo = this.bodyCNo = this.bodyGNo = 0;
