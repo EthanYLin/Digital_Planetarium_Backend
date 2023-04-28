@@ -52,7 +52,7 @@ public class UserController {
 
     @PostMapping("/update")
     public ResponseEntity<?> update(@RequestBody User user, HttpServletRequest request) {
-        Long uid = (Long) request.getSession().getAttribute("uid");
+        Long uid = user.getUid();
         if (uid == null) {
             return ResponseEntity.badRequest().body("未登录");
         }
