@@ -22,7 +22,7 @@ public class UserServiceImpl implements UserService {
     @Nullable
     public User login(String username, String password) {
         User user = userDao.findByUsernameAndPassword(username, password);
-        user.setPassword(null); // 防止密码泄露
+        if (user != null) user.setPassword(null); // 防止密码泄露
         return user;
     }
 
@@ -40,7 +40,7 @@ public class UserServiceImpl implements UserService {
         User dbUser = userDao.findByUid(user.getUid());
         if (dbUser == null) throw new ConstraintViolationException("用户不存在", null);
 
-        BeanUtil.copyProperties(user, dbUser,true, CopyOptions.create().setIgnoreNullValue(true).setIgnoreError(true));
+        BeanUtil.copyProperties(user, dbUser, CopyOptions.create().setIgnoreNullValue(true).setIgnoreError(true));
         dbUser = userDao.save(dbUser);
 
         dbUser.setPassword(null); // 防止密码泄露

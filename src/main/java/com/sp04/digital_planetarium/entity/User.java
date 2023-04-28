@@ -61,11 +61,11 @@ public class User {
         this.password = password;
     }
 
-    public Figure getProfile() {
+    public Figure getFigure() {
         return figure;
     }
 
-    public void setProfile(Figure figure) {
+    public void setFigure(Figure figure) {
         this.figure = figure;
     }
 }
