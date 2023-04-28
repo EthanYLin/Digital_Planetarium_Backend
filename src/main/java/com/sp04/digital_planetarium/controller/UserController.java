@@ -7,6 +7,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/user")
 public class UserController {
@@ -15,8 +17,10 @@ public class UserController {
 
     //TODO: maybe should change the implement of session
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestParam String username, @RequestParam String password,
+    public ResponseEntity<?> login(@RequestBody Map<String, String> registerRequest,
                                       HttpServletRequest request) {
+        String username = registerRequest.get("username");
+        String password = registerRequest.get("password");
         User user = userService.login(username, password);
         //TODO: 防止重复登录
         if (user == null) {
@@ -34,10 +38,12 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestParam String username, @RequestParam String password,
+    public ResponseEntity<?> register(@RequestBody Map<String, String> registerRequest,
                                       HttpServletRequest request) {
         //TODO: 防止登录后再注册
         //TODO: 处理用户名已存在的错误
+        String username = registerRequest.get("username");
+        String password = registerRequest.get("password");
         User user = new User(username, password); //采用自增uid与随机形象
         user = userService.register(user);
         request.getSession().setAttribute("uid", user.getUid());
