@@ -44,7 +44,7 @@ public class SocketIOController {
         System.out.println("Client: " + clientMap.get(client.getSessionId()));
         System.out.println("SessionID: " + client.getSessionId());
         System.out.println("Msg:" + msg);
-        System.out.println("Rooms: " + String.join(", ", client.getAllRooms()));
+        // System.out.println("Rooms: " + String.join(", ", client.getAllRooms()));
         System.out.println("-------END------");
     }
 
@@ -72,29 +72,33 @@ public class SocketIOController {
         PlayerSocketObject playerSocketObject = new PlayerSocketObject(userName, figure, initPos);
         playerSocketService.addPlayer(client.getSessionId(), playerSocketObject);
         clientMap.put(client.getSessionId(), userName);
-        log_client(client, "connected.");
 
-        server.getBroadcastOperations().sendEvent("update", playerSocketService.getAllPlayers());
+        log_client(client, "connected.");
+        System.out.println("Broadcast: New User Connected. User Count: " + playerSocketService.getAllPlayers().size());
+        server.getBroadcastOperations().sendEvent("update", "new connection from " + client.getSessionId());
 
     }
 
     @OnDisconnect
     public void onDisconnect(SocketIOClient client) {
         playerSocketService.removePlayer(client.getSessionId());
-        server.getBroadcastOperations().sendEvent("update", playerSocketService.getAllPlayers());
+        server.getBroadcastOperations().sendEvent("update", "disconnect from " + client.getSessionId());
         System.out.println("Client disconnected: " + client.getSessionId());
+        System.out.println("Broadcast: User Disconnected. User Count: " + playerSocketService.getAllPlayers().size());
     }
 
     @OnEvent("updatePos")
     public void onUpdatePos(SocketIOClient client, UpdatePosSoekctObject pos){
         playerSocketService.changePosition(client.getSessionId(), pos.getPosition());
-        server.getBroadcastOperations().sendEvent("update", playerSocketService.getAllPlayers());
+        System.out.println("Broadcast: User " + clientMap.get(client.getSessionId()) + " update position. User Count: " + playerSocketService.getAllPlayers().size());
+        server.getBroadcastOperations().sendEvent("update", "update position from " + client.getSessionId());
     }
 
     @OnEvent("updateFig")
     public void onUpdateFig(SocketIOClient client, UpdateFigSocketObject fig){
         playerSocketService.changeFigure(client.getSessionId(), fig.getFigure());
-        server.getBroadcastOperations().sendEvent("update", playerSocketService.getAllPlayers());
+        System.out.println("Broadcast: User " + clientMap.get(client.getSessionId()) + " update figure. User Count: " + playerSocketService.getAllPlayers().size());
+        server.getBroadcastOperations().sendEvent("update", "update figure from " + client.getSessionId());
     }
 
     @OnEvent("join")
