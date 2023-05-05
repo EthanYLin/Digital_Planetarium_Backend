@@ -75,14 +75,14 @@ public class SocketIOController {
 
         log_client(client, "connected.");
         System.out.println("Broadcast: New User Connected. User Count: " + playerSocketService.getAllPlayers().size());
-        server.getBroadcastOperations().sendEvent("update", "new connection from " + client.getSessionId());
+        server.getBroadcastOperations().sendEvent("update", playerSocketService.getAllPlayers());
 
     }
 
     @OnDisconnect
     public void onDisconnect(SocketIOClient client) {
         playerSocketService.removePlayer(client.getSessionId());
-        server.getBroadcastOperations().sendEvent("update", "disconnect from " + client.getSessionId());
+        server.getBroadcastOperations().sendEvent("update", playerSocketService.getAllPlayers());
         System.out.println("Client disconnected: " + client.getSessionId());
         System.out.println("Broadcast: User Disconnected. User Count: " + playerSocketService.getAllPlayers().size());
     }
@@ -91,14 +91,16 @@ public class SocketIOController {
     public void onUpdatePos(SocketIOClient client, UpdatePosSoekctObject pos){
         playerSocketService.changePosition(client.getSessionId(), pos.getPosition());
         System.out.println("Broadcast: User " + clientMap.get(client.getSessionId()) + " update position. User Count: " + playerSocketService.getAllPlayers().size());
-        server.getBroadcastOperations().sendEvent("update", "update position from " + client.getSessionId());
+        server.getBroadcastOperations().sendEvent("update", playerSocketService.getAllPlayers());
     }
 
     @OnEvent("updateFig")
     public void onUpdateFig(SocketIOClient client, UpdateFigSocketObject fig){
+        //TODO: 数据持久层操作
+        //实时操作
         playerSocketService.changeFigure(client.getSessionId(), fig.getFigure());
         System.out.println("Broadcast: User " + clientMap.get(client.getSessionId()) + " update figure. User Count: " + playerSocketService.getAllPlayers().size());
-        server.getBroadcastOperations().sendEvent("update", "update figure from " + client.getSessionId());
+        server.getBroadcastOperations().sendEvent("update", playerSocketService.getAllPlayers());
     }
 
     @OnEvent("join")
