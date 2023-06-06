@@ -1,7 +1,5 @@
 package com.sp04.digital_planetarium.service.serviceImpl;
 
-import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.bean.copier.CopyOptions;
 import com.sp04.digital_planetarium.entity.User;
 import com.sp04.digital_planetarium.repository.UserDao;
 import com.sp04.digital_planetarium.service.UserService;

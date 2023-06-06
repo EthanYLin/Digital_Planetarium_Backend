@@ -18,7 +18,6 @@ public class UserController {
     @Resource
     private UserService userService;
 
-    //TODO: maybe should change the implement of session
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> registerRequest,
                                       HttpServletRequest request) throws BadRequestException {
@@ -63,12 +62,12 @@ public class UserController {
     @PostMapping("/update")
     public ResponseEntity<?> update(@RequestBody User user, HttpServletRequest request)
             throws BadRequestException {
-        Long uid = user.getUid();
-        //TODO: 认证是否是本人操作
+        Long uid = (Long) request.getSession().getAttribute("uid");
         if (uid == null) {
             throw new BadRequestException("未登录", null);
+        } else if(!uid.equals(user.getUid())){
+            throw new BadRequestException("uid不匹配", null);
         }
-        user.setUid(uid);
         user = userService.update(user);
         return ResponseEntity.ok(user);
     }
