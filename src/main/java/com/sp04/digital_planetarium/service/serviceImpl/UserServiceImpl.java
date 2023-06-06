@@ -36,12 +36,10 @@ public class UserServiceImpl implements UserService {
     public User update(User user){
         User dbUser = userDao.findByUid(user.getUid());
         if (dbUser == null) throw new ConstraintViolationException("用户不存在", null);
-
-        BeanUtil.copyProperties(user, dbUser, CopyOptions.create().setIgnoreNullValue(true).setIgnoreError(true));
-        dbUser = userDao.save(dbUser);
-
-        dbUser.setPassword(null); // 防止密码泄露
-        return dbUser;
+        if (user.getPassword() == null) user.setPassword(dbUser.getPassword());
+        user = userDao.save(user);
+        user.setPassword(null); // 防止密码泄露
+        return user;
     }
 
     public Optional<User> findByUid(Long uid){

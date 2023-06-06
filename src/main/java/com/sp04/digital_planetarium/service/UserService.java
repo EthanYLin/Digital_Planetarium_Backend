@@ -26,7 +26,7 @@ public interface UserService {
 
     /**
      * 更新用户信息
-     * @param user User对象(user.uid必须存在), 不需要更新的字段保持null
+     * @param user User对象(user.uid必须存在), 若密码不需要更新则可以设置为null
      * @return 修改过后的User对象(密码会被置null)
      * @throws ConstraintViolationException user.uid不存在
      */
