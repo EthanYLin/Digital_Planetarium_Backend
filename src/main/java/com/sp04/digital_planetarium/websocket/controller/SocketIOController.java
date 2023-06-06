@@ -1,4 +1,4 @@
-package com.sp04.digital_planetarium.controller;
+package com.sp04.digital_planetarium.websocket.controller;
 
 import com.corundumstudio.socketio.SocketIOClient;
 import com.corundumstudio.socketio.SocketIOServer;
@@ -6,13 +6,19 @@ import com.corundumstudio.socketio.annotation.OnConnect;
 import com.corundumstudio.socketio.annotation.OnDisconnect;
 import com.corundumstudio.socketio.annotation.OnEvent;
 import com.sp04.digital_planetarium.entity.*;
-import com.sp04.digital_planetarium.service.PlayerSocketService;
 import com.sp04.digital_planetarium.service.UserService;
+import com.sp04.digital_planetarium.entity.User;
+import com.sp04.digital_planetarium.websocket.service.PlayerSocketService;
+import com.sp04.digital_planetarium.websocket.entity.UpdateUserFig;
+import com.sp04.digital_planetarium.websocket.entity.UpdateUserPos;
+import com.sp04.digital_planetarium.websocket.entity.Chat;
+import com.sp04.digital_planetarium.websocket.entity.Player;
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Controller
@@ -31,12 +37,12 @@ public class SocketIOController {
     BidiMap<UUID, String> clientMap = new DualHashBidiMap<>();
 
     private String getUserNameFromUid(Long uid){
-        User user = userService.findByUid(uid);
-        return user == null ? null : user.getUsername();
+        Optional<User> user = userService.findByUid(uid);
+        return user.map(User::getUsername).orElse(null);
     }
 
-    private ChatObject errorMsg(String userName, String message){
-        return new ChatObject("system", ChatObject.Type.PRIVATE, userName, message);
+    private Chat errorMsg(String userName, String message){
+        return new Chat("system", Chat.Type.PRIVATE, userName, message);
     }
 
     private void log_client(SocketIOClient client, String msg){
@@ -59,18 +65,18 @@ public class SocketIOController {
             return;
         }
 
-        User user = userService.findByUid(Long.parseLong(uid));
-        if(user == null){
+        Optional<User> user = userService.findByUid(Long.parseLong(uid));
+        if(user.isEmpty()){
             log_client(client, "uid not found");
             client.sendEvent("chat", errorMsg("system", "on connect: uid not found"));
             return;
         }
-        String userName = user.getUsername();
-        Figure figure = user.getFigure();
+        String userName = user.get().getUsername();
+        Figure figure = user.get().getFigure();
 
         Position initPos = new Position(0.0, 0.0, 0.0);
-        PlayerSocketObject playerSocketObject = new PlayerSocketObject(userName, figure, initPos);
-        playerSocketService.addPlayer(client.getSessionId(), playerSocketObject);
+        Player player = new Player(userName, figure, initPos);
+        playerSocketService.addPlayer(client.getSessionId(), player);
         clientMap.put(client.getSessionId(), userName);
 
         log_client(client, "connected.");
@@ -88,14 +94,14 @@ public class SocketIOController {
     }
 
     @OnEvent("updatePos")
-    public void onUpdatePos(SocketIOClient client, UpdatePosSoekctObject pos){
+    public void onUpdatePos(SocketIOClient client, UpdateUserPos pos){
         playerSocketService.changePosition(client.getSessionId(), pos.getPosition());
         System.out.println("Broadcast: User " + clientMap.get(client.getSessionId()) + " update position. User Count: " + playerSocketService.getAllPlayers().size());
         server.getBroadcastOperations().sendEvent("update", playerSocketService.getAllPlayers());
     }
 
     @OnEvent("updateFig")
-    public void onUpdateFig(SocketIOClient client, UpdateFigSocketObject fig){
+    public void onUpdateFig(SocketIOClient client, UpdateUserFig fig){
         //TODO: 数据持久层操作
         //实时操作
         playerSocketService.changeFigure(client.getSessionId(), fig.getFigure());
@@ -116,35 +122,35 @@ public class SocketIOController {
     }
 
     @OnEvent("chat")
-    public void onChat(SocketIOClient client, ChatObject chatObject) {
+    public void onChat(SocketIOClient client, Chat chat) {
         String from = clientMap.get(client.getSessionId());
-        log_client(client, "msg " + chatObject.getType() + " to " + chatObject.getTo() + " : " + chatObject.getMessage());
+        log_client(client, "msg " + chat.getType() + " to " + chat.getTo() + " : " + chat.getMessage());
 
-        if(chatObject.isSomeNull()){
+        if(chat.isSomeNull()){
             log_client(client, "some properties of ChatObject is null");
             client.sendEvent("chat", errorMsg(from, "some properties of ChatObject is null"));
             return;
         }
-        if(! from.equals(chatObject.getFromUserName())){
+        if(! from.equals(chat.getFromUserName())){
             log_client(client, "fromUserName in ChatObject is not equal to the one in Session");
             client.sendEvent("chat", errorMsg(from, "fromUserName in ChatObject is not equal to the one in Session"));
             return;
         }
-        if(chatObject.getType() == ChatObject.Type.ROOM && ! client.getAllRooms().contains(chatObject.getTo())){
+        if(chat.getType() == Chat.Type.ROOM && ! client.getAllRooms().contains(chat.getTo())){
             log_client(client, "you are not in this room");
             client.sendEvent("chat", errorMsg(from, "you are not in this room"));
             return;
         }
-        if(chatObject.getType() == ChatObject.Type.PRIVATE && ! clientMap.containsValue(chatObject.getTo())){
+        if(chat.getType() == Chat.Type.PRIVATE && ! clientMap.containsValue(chat.getTo())){
             log_client(client, "the user you want to chat with is not online");
             client.sendEvent("chat", errorMsg(from, "the user you want to chat with is not online"));
             return;
         }
 
-        switch (chatObject.getType()) {
-            case PRIVATE -> server.getClient(clientMap.getKey(chatObject.getTo())).sendEvent("chat", chatObject);
-            case ROOM -> server.getRoomOperations(chatObject.getTo()).sendEvent("chat", chatObject);
-            case BROADCAST -> server.getBroadcastOperations().sendEvent("chat", chatObject);
+        switch (chat.getType()) {
+            case PRIVATE -> server.getClient(clientMap.getKey(chat.getTo())).sendEvent("chat", chat);
+            case ROOM -> server.getRoomOperations(chat.getTo()).sendEvent("chat", chat);
+            case BROADCAST -> server.getBroadcastOperations().sendEvent("chat", chat);
         }
 
     }

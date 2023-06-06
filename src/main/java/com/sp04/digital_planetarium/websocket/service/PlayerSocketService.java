@@ -1,14 +1,14 @@
-package com.sp04.digital_planetarium.service;
+package com.sp04.digital_planetarium.websocket.service;
 
 import com.sp04.digital_planetarium.entity.Figure;
-import com.sp04.digital_planetarium.entity.PlayerSocketObject;
 import com.sp04.digital_planetarium.entity.Position;
+import com.sp04.digital_planetarium.websocket.entity.Player;
 
 import java.util.List;
 import java.util.UUID;
 
 public interface PlayerSocketService {
-    public void addPlayer(UUID sessionID, PlayerSocketObject player);
+    public void addPlayer(UUID sessionID, Player player);
 
     public void changeFigure(UUID sessionID, Figure figure);
 
@@ -16,6 +16,6 @@ public interface PlayerSocketService {
 
     public void removePlayer(UUID sessionID);
 
-    public List<PlayerSocketObject> getAllPlayers();
+    public List<Player> getAllPlayers();
 
 }

@@ -1,6 +1,8 @@
-package com.sp04.digital_planetarium.entity;
+package com.sp04.digital_planetarium.websocket.entity;
 
-public class UpdatePosSoekctObject {
+import com.sp04.digital_planetarium.entity.Position;
+
+public class UpdateUserPos {
     public Position getPosition() {
         return position;
     }
@@ -11,10 +13,10 @@ public class UpdatePosSoekctObject {
 
     private Position position;
 
-    public UpdatePosSoekctObject() {
+    public UpdateUserPos() {
     }
 
-    public UpdatePosSoekctObject(Position position) {
+    public UpdateUserPos(Position position) {
         this.position = position;
     }
 

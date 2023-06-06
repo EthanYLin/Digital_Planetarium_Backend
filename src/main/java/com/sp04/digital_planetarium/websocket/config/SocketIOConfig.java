@@ -1,4 +1,4 @@
-package com.sp04.digital_planetarium.config;
+package com.sp04.digital_planetarium.websocket.config;
 
 import com.corundumstudio.socketio.Configuration;
 import com.corundumstudio.socketio.SocketIOServer;

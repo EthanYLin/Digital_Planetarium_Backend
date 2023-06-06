@@ -1,5 +1,6 @@
 package com.sp04.digital_planetarium.entity;
 
+import com.sp04.digital_planetarium.entity.Figure;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 

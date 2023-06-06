@@ -1,6 +1,8 @@
-package com.sp04.digital_planetarium.entity;
+package com.sp04.digital_planetarium.websocket.entity;
 
-public class UpdateFigSocketObject {
+import com.sp04.digital_planetarium.entity.Figure;
+
+public class UpdateUserFig {
     public Figure getFigure() {
         return figure;
     }
@@ -11,10 +13,10 @@ public class UpdateFigSocketObject {
 
     private Figure figure;
 
-    public UpdateFigSocketObject() {
+    public UpdateUserFig() {
     }
 
-    public UpdateFigSocketObject(Figure figure) {
+    public UpdateUserFig(Figure figure) {
         this.figure = figure;
     }
 }

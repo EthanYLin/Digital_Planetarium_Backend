@@ -1,6 +1,13 @@
-package com.sp04.digital_planetarium.entity;
+package com.sp04.digital_planetarium.websocket.entity;
 
-public class PlayerSocketObject {
+import com.sp04.digital_planetarium.entity.Figure;
+import com.sp04.digital_planetarium.entity.Position;
+
+public class Player {
+    private String username;
+    private Figure figure;
+    private Position position;
+
     public String getUsername() {
         return username;
     }
@@ -25,18 +32,13 @@ public class PlayerSocketObject {
         this.position = position;
     }
 
-    private String username;
-    private Figure figure;
-    private Position position;
-
-    public PlayerSocketObject() {
+    public Player() {
     }
 
-    public PlayerSocketObject(String username, Figure figure, Position position) {
+    public Player(String username, Figure figure, Position position) {
         this.username = username;
         this.figure = figure;
         this.position = position;
     }
-
 
 }

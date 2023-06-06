@@ -7,11 +7,9 @@ import com.sp04.digital_planetarium.repository.UserDao;
 import com.sp04.digital_planetarium.service.UserService;
 import jakarta.annotation.Resource;
 import jakarta.validation.*;
-import org.springframework.beans.BeanUtils;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
-import java.util.Set;
+import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -19,10 +17,9 @@ public class UserServiceImpl implements UserService {
     @Resource
     private UserDao userDao;
 
-    @Nullable
-    public User login(String username, String password) {
-        User user = userDao.findByUsernameAndPassword(username, password);
-        if (user != null) user.setPassword(null); // 防止密码泄露
+    public Optional<User> login(String username, String password) {
+        Optional<User> user = Optional.ofNullable(userDao.findByUsernameAndPassword(username, password));
+        user.ifPresent(u -> u.setPassword(null)); // 防止密码泄露
         return user;
     }
 
@@ -47,7 +44,11 @@ public class UserServiceImpl implements UserService {
         return dbUser;
     }
 
-    public User findByUid(Long uid){
-        return userDao.findByUid(uid);
+    public Optional<User> findByUid(Long uid){
+        return Optional.ofNullable(userDao.findByUid(uid));
+    }
+
+    public Optional<User> findByUsername(String username) {
+        return Optional.ofNullable(userDao.findByUsername(username));
     }
 }

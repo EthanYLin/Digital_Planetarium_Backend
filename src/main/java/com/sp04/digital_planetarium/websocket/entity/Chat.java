@@ -1,6 +1,6 @@
-package com.sp04.digital_planetarium.entity;
+package com.sp04.digital_planetarium.websocket.entity;
 
-public class ChatObject {
+public class Chat {
 
     public enum Type {
         PRIVATE, ROOM, BROADCAST
@@ -43,10 +43,10 @@ public class ChatObject {
         this.message = message;
     }
 
-    public ChatObject() {
+    public Chat() {
     }
 
-    public ChatObject(String fromUserName, Type type, String to, String message) {
+    public Chat(String fromUserName, Type type, String to, String message) {
         this.fromUserName = fromUserName;
         this.type = type;
         this.to = to;
