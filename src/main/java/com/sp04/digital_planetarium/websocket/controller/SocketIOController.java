@@ -15,6 +15,8 @@ import com.sp04.digital_planetarium.websocket.entity.Chat;
 import com.sp04.digital_planetarium.websocket.entity.Player;
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
@@ -33,6 +35,8 @@ public class SocketIOController {
     @Autowired
     private PlayerSocketService playerSocketService;
 
+    private static final Logger logger = LoggerFactory.getLogger(SocketIOController.class);
+
     //存储SessionID和UserName的映射关系
     BidiMap<UUID, String> clientMap = new DualHashBidiMap<>();
 
@@ -41,11 +45,12 @@ public class SocketIOController {
         return user.map(User::getUsername).orElse(null);
     }
 
-    private Chat errorMsg(String userName, String message){
+    private Chat generateErrorMsg(String userName, String message){
         return new Chat("system", Chat.Type.PRIVATE, userName, message);
     }
 
     private void log_client(SocketIOClient client, String msg){
+        logger.info("INFO");
         System.out.println("-------START------");
         System.out.println("Client: " + clientMap.get(client.getSessionId()));
         System.out.println("SessionID: " + client.getSessionId());
@@ -56,19 +61,23 @@ public class SocketIOController {
 
     @OnConnect
     public void onConnect(SocketIOClient client) {
+
+        System.out.println("PRINT COOKIE: " + client.getHandshakeData().getHttpHeaders().get("Cookie"));
+
+
         String uid = client.getHandshakeData().getSingleUrlParam("uid");
         try {
             Long.parseLong(uid);
         } catch (NumberFormatException e) {
             log_client(client, "uid is not a number");
-            client.sendEvent("chat", errorMsg("system", "on connect: uid is not a number"));
+            client.sendEvent("chat", generateErrorMsg("system", "on connect: uid is not a number"));
             return;
         }
 
         Optional<User> user = userService.findByUid(Long.parseLong(uid));
         if(user.isEmpty()){
             log_client(client, "uid not found");
-            client.sendEvent("chat", errorMsg("system", "on connect: uid not found"));
+            client.sendEvent("chat", generateErrorMsg("system", "on connect: uid not found"));
             return;
         }
         String userName = user.get().getUsername();
@@ -128,22 +137,22 @@ public class SocketIOController {
 
         if(chat.isSomeNull()){
             log_client(client, "some properties of ChatObject is null");
-            client.sendEvent("chat", errorMsg(from, "some properties of ChatObject is null"));
+            client.sendEvent("chat", generateErrorMsg(from, "some properties of ChatObject is null"));
             return;
         }
         if(! from.equals(chat.getFromUserName())){
             log_client(client, "fromUserName in ChatObject is not equal to the one in Session");
-            client.sendEvent("chat", errorMsg(from, "fromUserName in ChatObject is not equal to the one in Session"));
+            client.sendEvent("chat", generateErrorMsg(from, "fromUserName in ChatObject is not equal to the one in Session"));
             return;
         }
         if(chat.getType() == Chat.Type.ROOM && ! client.getAllRooms().contains(chat.getTo())){
             log_client(client, "you are not in this room");
-            client.sendEvent("chat", errorMsg(from, "you are not in this room"));
+            client.sendEvent("chat", generateErrorMsg(from, "you are not in this room"));
             return;
         }
         if(chat.getType() == Chat.Type.PRIVATE && ! clientMap.containsValue(chat.getTo())){
             log_client(client, "the user you want to chat with is not online");
-            client.sendEvent("chat", errorMsg(from, "the user you want to chat with is not online"));
+            client.sendEvent("chat", generateErrorMsg(from, "the user you want to chat with is not online"));
             return;
         }
 
