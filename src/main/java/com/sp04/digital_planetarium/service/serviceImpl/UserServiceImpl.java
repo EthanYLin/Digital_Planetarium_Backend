@@ -3,6 +3,7 @@ package com.sp04.digital_planetarium.service.serviceImpl;
 import com.sp04.digital_planetarium.entity.User;
 import com.sp04.digital_planetarium.repository.UserDao;
 import com.sp04.digital_planetarium.service.UserService;
+import com.sp04.digital_planetarium.utils.JwtUtils;
 import jakarta.annotation.Resource;
 import jakarta.validation.*;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,11 @@ public class UserServiceImpl implements UserService {
         Optional<User> user = Optional.ofNullable(userDao.findByUsernameAndPassword(username, password));
         user.ifPresent(u -> u.setPassword(null)); // 防止密码泄露
         return user;
+    }
+
+    public String getWebSocketToken(Long uid) {
+        User user = findByUid(uid).orElseThrow(() -> new ConstraintViolationException("用户不存在", null));
+        return JwtUtils.createJWT(user.getUid(), user.getUsername());
     }
 
     public User register(User user){

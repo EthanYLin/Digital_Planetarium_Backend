@@ -17,6 +17,14 @@ public interface UserService {
     Optional<User> login(String username, String password);
 
     /**
+     * 获取连接WebSocket的一次性token
+     * @param uid 用户uid
+     * @return jwt
+     * @throws ConstraintViolationException user.uid不存在
+     */
+    String getWebSocketToken(Long uid);
+
+    /**
      * 使用给定的User对象进行注册
      * @param user User对象(user.uid可以为任意值, 不影响注册)
      * @return User(uid为数据库中的值, 密码会被置null)
@@ -42,7 +50,7 @@ public interface UserService {
     /**
      * 根据用户名查找用户
      * @param username 用户名
-     * @return Optional:User(密码会被置null)
+     * @return Optional:User(包括密码)
      */
     Optional<User> findByUsername(String username);
 }

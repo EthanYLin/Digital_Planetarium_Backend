@@ -14,7 +14,6 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/user")
-@CrossOrigin(origins = "*")
 public class UserController {
     @Resource
     private UserService userService;
@@ -71,6 +70,17 @@ public class UserController {
         }
         user = userService.update(user);
         return ResponseEntity.ok(user);
+    }
+
+    @GetMapping("/webSocketToken")
+    public ResponseEntity<?> getWebSocketToken(HttpServletRequest request) throws BadRequestException {
+        Long uid = (Long) request.getSession().getAttribute("uid");
+        if (uid == null) {
+            throw new BadRequestException("未登录", null);
+        }
+        String token = userService.getWebSocketToken(uid);
+        Map<String, String> map = Map.of("token", token);
+        return ResponseEntity.ok(map);
     }
 
 }

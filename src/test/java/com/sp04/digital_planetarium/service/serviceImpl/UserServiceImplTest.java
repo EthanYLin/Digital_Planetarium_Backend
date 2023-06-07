@@ -3,6 +3,9 @@ package com.sp04.digital_planetarium.service.serviceImpl;
 import com.sp04.digital_planetarium.entity.Figure;
 import com.sp04.digital_planetarium.entity.User;
 import com.sp04.digital_planetarium.repository.UserDao;
+import com.sp04.digital_planetarium.utils.JwtUtils;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwt;
 import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,11 +31,20 @@ public class UserServiceImplTest {
 
     @BeforeEach
     public void setUp() {
-        User user = new User();
-        user.setUid(1L);
-        user.setUsername("testUsername");
-        user.setPassword("testPassword");
-        userDao.save(user);
+//        User user = new User();
+//        user.setUid(1L);
+//        user.setUsername("testUsername");
+//        user.setPassword("testPassword");
+//        userDao.save(user);
+    }
+
+    @Test
+    public void testJWT(){
+        String jwt = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwidXNlcm5hbWUiOiJhZG1pbiIsImlhdCI6MTY4NjEyNDIxNiwiZXhwIjoxNjg2MTI0Mjc2fQ.2Xk_5ggA31Mhq236Gj8_k0SkwakVD1ioF_RY7r-xp4Y";
+        Claims claims = JwtUtils.parseJWT(jwt);
+        System.out.println(claims.getSubject());
+        System.out.println(claims.get("username"));
+
     }
 
     //使用正确用户名和密码登录
