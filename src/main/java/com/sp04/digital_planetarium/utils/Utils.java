@@ -1,6 +1,6 @@
 package com.sp04.digital_planetarium.utils;
 
-public class util {
+public class Utils {
     /**
      * 生成在[min, max]范围内的随机整数
      * @param min 随机数最小值(含)

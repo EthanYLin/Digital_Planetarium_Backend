@@ -1,6 +1,6 @@
 package com.sp04.digital_planetarium.entity;
 
-import com.sp04.digital_planetarium.utils.util;
+import com.sp04.digital_planetarium.utils.Utils;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.Max;
@@ -70,10 +70,10 @@ public class Figure {
     public Figure(boolean useRandom) {
         if (useRandom) {
             //TODO: get from database
-            this.headGNo = util.randomInt(0, 1);
-            this.bodyGNo = util.randomInt(0, 3);
-            this.headCNo = util.randomInt(0, 11);
-            this.bodyCNo = util.randomInt(0, 11);
+            this.headGNo = Utils.randomInt(0, 1);
+            this.bodyGNo = Utils.randomInt(0, 3);
+            this.headCNo = Utils.randomInt(0, 11);
+            this.bodyCNo = Utils.randomInt(0, 11);
         } else {
             //TODO: get default value from database
             this.headCNo = this.headGNo = this.bodyCNo = this.bodyGNo = 0;
